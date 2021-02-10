@@ -53,8 +53,8 @@ class PaymentTests(APITestCase):
         payment.save()
 
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-        response = self.client.delete(f"/payments/{payment.id}")
+        response = self.client.delete(f"/paymenttypes/{payment.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        response = self.client.get(f"/payments/{payment.id}")
+        response = self.client.get(f"/paymenttypes/{payment.id}")
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
