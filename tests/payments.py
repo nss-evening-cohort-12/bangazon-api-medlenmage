@@ -2,6 +2,7 @@ import datetime
 import json
 from rest_framework import status
 from rest_framework.test import APITestCase
+from bangazonapi.models import Payment
 
 
 class PaymentTests(APITestCase):
@@ -41,3 +42,19 @@ class PaymentTests(APITestCase):
         self.assertEqual(json_response["create_date"], str(datetime.date.today()))
 
     # TODO: Delete payment type
+    
+    def test_delete_payment(self):
+        payment = Payment()
+        payment.merchant_name = 'bob'
+        payment.account_number = '123456'
+        payment.customer_id = 1
+        payment.expiration_date = '2023-12-15'
+        payment.create_date = '2020-12-15'
+        payment.save()
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        response = self.client.delete(f"/paymenttypes/{payment.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.get(f"/paymenttypes/{payment.id}")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
