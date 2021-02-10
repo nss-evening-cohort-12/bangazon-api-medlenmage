@@ -47,9 +47,10 @@ class PaymentTests(APITestCase):
         payment = Payment()
         payment.merchant_name = 'bob'
         payment.account_number = '123456'
-        payment.customer = 1
+        payment.customer_id = 1
         payment.expiration_date = '2023-12-15'
         payment.create_date = '2020-12-15'
+        payment.save()
 
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.delete(f"/payments/{payment.id}")
