@@ -206,8 +206,8 @@ class Profile(ViewSet):
             """
 
             try:
-                open_order = Order.objects.get(customer=current_user)
-                print(open_order)
+                open_order = Order.objects.get(
+                    customer=current_user, payment_type__isnull=True)
             except Order.DoesNotExist as ex:
                 open_order = Order()
                 open_order.created_date = datetime.datetime.now()
