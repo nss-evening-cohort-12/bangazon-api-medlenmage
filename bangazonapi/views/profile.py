@@ -61,7 +61,7 @@ class Profile(ViewSet):
             }
         """
         try:
-            current_user = Customer.objects.get(user__id=4)
+            current_user = Customer.objects.get(user__id=request.auth.user_id)
             serializer = ProfileSerializer(current_user, many=False, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
@@ -302,7 +302,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('id', 'first_name', 'last_name', 'email')
         depth = 1
 
 
