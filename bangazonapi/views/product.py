@@ -248,6 +248,7 @@ class Products(ViewSet):
         order = self.request.query_params.get('order_by', None)
         direction = self.request.query_params.get('direction', None)
         number_sold = self.request.query_params.get('number_sold', None)
+        minimum_price = self.request.query_params.get('minimum_price', None)
 
         if order is not None:
             order_filter = order
@@ -271,6 +272,14 @@ class Products(ViewSet):
                 return False
 
             products = filter(sold_filter, products)
+
+        if minimum_price is not None:
+            def price_filter(product):
+                if product.price > int(minimum_price):
+                    return True
+                return False
+
+            products = filter(price_filter, products)
 
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
