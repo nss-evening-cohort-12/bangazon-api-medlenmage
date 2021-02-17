@@ -105,11 +105,12 @@ class Products(ViewSet):
 
         try:
             new_product.clean_fields(exclude='image_path')
+            new_product.save()
         except ValidationError as ex:
                 return Response({"msg": ex}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        new_product.save()
+        
 
         serializer = ProductSerializer(
             new_product, context={'request': request})
