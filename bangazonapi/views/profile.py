@@ -226,54 +226,55 @@ class Profile(ViewSet):
 
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get','post'], detail=False)
     def favoritesellers(self, request):
-        """
-        @api {GET} /profile/favoritesellers GET favorite sellers
-        @apiName GetFavoriteSellers
-        @apiGroup UserProfile
+        if request.method == "GET":
+            """
+            @api {GET} /profile/favoritesellers GET favorite sellers
+            @apiName GetFavoriteSellers
+            @apiGroup UserProfile
 
-        @apiHeader {String} Authorization Auth token
-        @apiHeaderExample {String} Authorization
-            Token 9ba45f09651c5b0c404f37a2d2572c026c146611
+            @apiHeader {String} Authorization Auth token
+            @apiHeaderExample {String} Authorization
+                Token 9ba45f09651c5b0c404f37a2d2572c026c146611
 
-        @apiSuccess (200) {id} id Favorite id
-        @apiSuccess (200) {Object} seller Favorited seller
-        @apiSuccess (200) {String} seller.url Seller URI
-        @apiSuccess (200) {String} seller.phone_number Seller phone number
-        @apiSuccess (200) {String} seller.address Seller address
-        @apiSuccess (200) {String} seller.user Seller user profile URI
-        @apiSuccessExample {json} Success
-            [
-                {
-                    "id": 1,
-                    "seller": {
-                        "url": "http://localhost:8000/customers/5",
-                        "phone_number": "555-1212",
-                        "address": "100 Endless Way",
-                        "user": "http://localhost:8000/users/6"
+            @apiSuccess (200) {id} id Favorite id
+            @apiSuccess (200) {Object} seller Favorited seller
+            @apiSuccess (200) {String} seller.url Seller URI
+            @apiSuccess (200) {String} seller.phone_number Seller phone number
+            @apiSuccess (200) {String} seller.address Seller address
+            @apiSuccess (200) {String} seller.user Seller user profile URI
+            @apiSuccessExample {json} Success
+                [
+                    {
+                        "id": 1,
+                        "seller": {
+                            "url": "http://localhost:8000/customers/5",
+                            "phone_number": "555-1212",
+                            "address": "100 Endless Way",
+                            "user": "http://localhost:8000/users/6"
+                        }
+                    },
+                    {
+                        "id": 2,
+                        "seller": {
+                            "url": "http://localhost:8000/customers/6",
+                            "phone_number": "555-1212",
+                            "address": "100 Dauntless Way",
+                            "user": "http://localhost:8000/users/7"
+                        }
+                    },
+                    {
+                        "id": 3,
+                        "seller": {
+                            "url": "http://localhost:8000/customers/7",
+                            "phone_number": "555-1212",
+                            "address": "100 Indefatiguable Way",
+                            "user": "http://localhost:8000/users/8"
+                        }
                     }
-                },
-                {
-                    "id": 2,
-                    "seller": {
-                        "url": "http://localhost:8000/customers/6",
-                        "phone_number": "555-1212",
-                        "address": "100 Dauntless Way",
-                        "user": "http://localhost:8000/users/7"
-                    }
-                },
-                {
-                    "id": 3,
-                    "seller": {
-                        "url": "http://localhost:8000/customers/7",
-                        "phone_number": "555-1212",
-                        "address": "100 Indefatiguable Way",
-                        "user": "http://localhost:8000/users/8"
-                    }
-                }
-            ]
-        """
+                ]
+            """
         customer = Customer.objects.get(user=request.auth.user)
         favorites = Favorite.objects.filter(customer=customer)
 
@@ -281,6 +282,16 @@ class Profile(ViewSet):
             favorites, many=True, context={'request': request})
         return Response(serializer.data)
 
+    if request.method == "POST":
+        new_favorite = Favorite()
+        new_favorite.customer = Customer.objects.get(user=request.auth.user)
+        new_favorite.seller = Customer.objects.get(favorited_seller__id=request.data['seller'])
+
+        new_favorite.save()  
+
+        serializer = FavoriteSerializer(
+            new_favorite, many=False, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LineItemSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for products
