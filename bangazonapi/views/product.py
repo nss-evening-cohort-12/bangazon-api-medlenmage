@@ -275,7 +275,7 @@ class Products(ViewSet):
 
         if minimum_price is not None:
             def price_filter(product):
-                if product.price > int(minimum_price):
+                if product.price > float(minimum_price):
                     return True
                 return False
 
