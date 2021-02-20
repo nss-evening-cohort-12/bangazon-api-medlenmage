@@ -8,3 +8,4 @@ from .recommendation import Recommendation
 from .rating import Rating
 from .favorite import Favorite
 from .productrating import ProductRating
+from .product_likes import ProductLikes
