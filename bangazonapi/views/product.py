@@ -305,7 +305,7 @@ class Products(ViewSet):
         return Response(serializer.data)
 
     @action(methods=['get'], detail=False)
-    def likes(self, request):
+    def liked(self, request):
 
         """Handle GET requests for product likes
 
@@ -320,7 +320,7 @@ class Products(ViewSet):
         return Response(serializer.data)
 
     @action(methods=['post', 'delete'], detail=True)
-    def likes(self,request, pk=None):
+    def like(self,request, pk=None):
 
         current_product = Product.objects.get(pk=pk)
         current_customer = Customer.objects.get(user=request.auth.user)
