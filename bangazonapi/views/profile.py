@@ -302,8 +302,8 @@ class Profile(ViewSet):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
                 serializer = FavoriteSerializer(
-                        favorite, context={'request': request})
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    favorite, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
             
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
