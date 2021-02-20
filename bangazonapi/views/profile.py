@@ -226,7 +226,7 @@ class Profile(ViewSet):
 
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get','post'], detail=False)
     def favoritesellers(self, request):
         """
         @api {GET} /profile/favoritesellers GET favorite sellers
@@ -275,12 +275,37 @@ class Profile(ViewSet):
             ]
         """
         customer = Customer.objects.get(user=request.auth.user)
-        favorites = Favorite.objects.filter(customer=customer)
+        if request.method == "GET":
 
-        serializer = FavoriteSerializer(
-            favorites, many=True, context={'request': request})
-        return Response(serializer.data)
+           
+            favorites = Favorite.objects.filter(customer=customer)
 
+            serializer = FavoriteSerializer(
+                favorites, many=True, context={'request': request})
+            return Response(serializer.data)
+
+
+        if request.method == "POST":
+            seller_id = self.request.data["seller"]
+            if seller_id is not None:
+                seller = Customer.objects.get(pk=seller_id)
+                try:
+                    favorite = Favorite.objects.get(customer=customer, seller=seller)
+                except Favorite.DoesNotExist as ex:
+                    new_favorite = Favorite()
+                    new_favorite.customer = customer
+                    new_favorite.seller = seller
+                    new_favorite.save()
+        
+                    serializer = FavoriteSerializer(
+                        new_favorite, context={'request': request})
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+                serializer = FavoriteSerializer(
+                    favorite, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class LineItemSerializer(serializers.HyperlinkedModelSerializer):
     """JSON serializer for products
